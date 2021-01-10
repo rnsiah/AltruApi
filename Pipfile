@@ -8,8 +8,19 @@ verify_ssl = true
 [packages]
 django = "*"
 djangorestframework = "*"
-django-rest-auth = "*"
+django-rest-auth = {extras = ["with-social"], version = "*"}
 djangorestframework-jwt = "*"
+django-cors-headers = "*"
+django-countries = "*"
+stripe = "*"
+django-allauth = "*"
+django-rest-framework = "*"
+segno = "*"
+pillow = "*"
+qrcode = "*"
+django-qr-code = "*"
+pymaging = {git = "git://github.com/ojii/pymaging.git"}
+pymaging-png = {git = "git://github.com/ojii/pymaging-png.git"}
 
 [requires]
 python_version = "3.8"

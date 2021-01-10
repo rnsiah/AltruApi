@@ -1,8 +1,11 @@
 from rest_framework import viewsets, generics, status
 from rest_framework.permissions import AllowAny
-from Alt.models import Shirt, NonProfit, Atrocity, Category
-from api.models import User
-from .serializers import ShirtSerializer, NonProfitSerializer, AtrocitySerializer,  CategorySerializer
+from rest_framework.authentication import TokenAuthentication
+from Alt.models import Shirt, NonProfit, Atrocity, Category, Rating
+from api.models import User, UserProfile
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from .serializers import ShirtSerializer, NonProfitSerializer, AtrocitySerializer,  CategorySerializer, RatingSerializer
 from api.serializers import UserSerializer
 from api.permissions import IsLoggedInUserOrAdmin, IsAdminUser
 
@@ -26,11 +29,37 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 
-class ShirtList(generics.ListCreateAPIView):
-  permission_classes = []
+
+class ShirtList(viewsets.ModelViewSet):
+  authentication_classes = (TokenAuthentication, )
 
   serializer_class = ShirtSerializer
   queryset= Shirt.objects.all()
+
+  @action(detail=True, methods=['POST'])
+  def rate_shirt(self,request, pk=None):
+    if 'stars' in request.data:
+      shirt = Shirt.objects.get(id=pk)
+      stars = request.data['stars']
+      user = request.user
+      
+
+
+      try:
+        rating = Rating.objects.get(user = user.id, shirt = shirt.id)
+        rating.stars = stars
+        rating.save()
+        serializer = RatingSerializer(rating, many =False)
+        response = {'message': 'Rating Updated', 'result':serializer.data}
+        return Response(response, status=status.HTTP_200_OK)
+      except:
+        rating = Rating.objects.create(user =user, shirt= shirt)
+        serializer =RatingSerializer(rating)
+        response = {'message': 'Rating Created', 'result':serializer.data}
+        return Response(response, status=status.HTTP_200_OK)
+    else:
+      response = {'messeage': 'You need to provide a rating'}
+      return Response(response, status=status.HTTP_400_BAD_REQUEST)
   
      
 class NonProfitList(generics.ListAPIView):
@@ -48,6 +77,12 @@ class CategoryList(generics.ListAPIView):
   permission_classes = []
   serializer_class = CategorySerializer
   queryset= Category.objects.all()
+
+class RatingViewSet(viewsets.ModelViewSet):
+  queryset = Rating.objects.all()
+  serializer_class = RatingSerializer
+  authentication_classes = (TokenAuthentication, )
+  
 
 
 
@@ -69,9 +104,29 @@ class FeaturedAtrocities(generics.ListAPIView):
 
 
 
+
+
+
 class FeaturedNonProfits(generics.ListAPIView):
   permission_classes = []
   serializer_class = NonProfitSerializer
   
   def get_queryset(self):
     return NonProfit.objects.filter(featured = True)
+
+
+
+     
+  
+
+
+
+
+  
+  
+  
+
+  
+   
+
+  

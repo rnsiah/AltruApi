@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from api.models import User, UserProfile
-from  Alt.models import Shirt, Atrocity, NonProfit, Category
+from  Alt.models import Shirt, Atrocity, NonProfit, Category, Rating
+
+
+
 
 
 
@@ -36,7 +39,7 @@ class ShirtSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shirt
-        fields = ['id', 'name', 'price', 'country', 'shirt_image','Atrocity', 'category', 'slug','original_image']
+        fields = ['id', 'name', 'price', 'country', 'shirt_image','Atrocity', 'category', 'slug','original_image', 'no_of_ratings', 'average_rating']
 
   
 
@@ -54,6 +57,11 @@ class NonProfitSerializer(serializers.ModelSerializer):
         depth = 2
 
 
+class RatingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rating
+        fields= ['user', 'shirt', 'stars']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -71,10 +79,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     profile = UserProfileSerializer(required=True)
+    
 
     class Meta:
         model = User
-        fields = ('url', 'email', 'first_name', 'last_name', 'password', 'profile')
+        fields = ('url', 'email', 'first_name', 'last_name', 'password','username',  'profile')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -103,3 +112,5 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         profile.save()
 
         return instance
+
+

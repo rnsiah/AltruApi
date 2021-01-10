@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.urls import path
-import Alt
+import Alt, StripeAPI
+from rest_framework.authtoken.views import obtain_auth_token
 
 from django.contrib import admin
 
@@ -23,6 +24,12 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('api.urls')),
+    url(r'^auth/', include('rest_auth.urls')),
+    path('secure/', obtain_auth_token),
+    url(r'^auth/registration/', include('rest_auth.registration.urls')),
     path('', include('Alt.urls')),
+    path('payments/', include('StripeAPI.urls')),
+    path('accounts/', include('allauth.urls')),
+ 
 
 ]

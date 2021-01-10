@@ -31,22 +31,37 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_auth.registration',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django_countries',
+    'allauth',
+    'allauth.account',
     'api',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth', 
     'Alt',
+    'corsheaders',
+    'StripeAPI',
+    'stripe',
+    'qr_code',
+  
 ]
+
+SITE_ID= 1
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -87,16 +102,16 @@ DATABASES = {
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+        
+    
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
 }
-REST_USE_JWT = True
 
 
 
@@ -133,10 +148,51 @@ USE_L10N = True
 USE_TZ = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/' 
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_root")
+MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'api.User'
 
+CORS_ALLOWED_ORIGINS = [
+    
+    "http://localhost:8080",
+   
+]
+
+STRIPE_SECRET_KEY ='sk_test_51HF8cGLtfSZy4bJMhU10RNlsqEYNLbxtBR3PSPMifN3G1eIGj5hE7vqulj4S9ORPCHPnU0iWW2GQbKOP2cntkAel00xkfeeSQC'
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51HF8cGLtfSZy4bJME1EEVB3NK2ymtrhBc90Rnl1M3vqaszeVi91JLHYhvjNOxJMlPffbmupoefjGABVNjFSIHPtK00u4F0AOwd'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True   
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+
+
+AUTHENTICATION_BACKENDS = (
+ # Needed to login by username in Django admin, regardless of `allauth`
+ "django.contrib.auth.backends.ModelBackend",
+
+ # `allauth` specific authentication methods, such as login by e-mail
+ "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+
+REST_AUTH_SERIALIZERS ={
+    'USER_DETAILS_SERIALIZER' : 'api.serializers'
+}
