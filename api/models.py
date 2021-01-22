@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -21,7 +22,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 class User(AbstractUser):
-    username = models.CharField(blank=True, null=True, max_length=50)
+    username = models.CharField(max_length=100, blank = True, null=True)
     email = models.EmailField(_('email address'), unique=True)
 
     USERNAME_FIELD = 'email'
@@ -42,6 +43,7 @@ def upload_path_handler():
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile', primary_key=True)
+    username = models.CharField(max_length=100)
     title = models.CharField(max_length=5)
     dob = models.DateField(null=True)
     address = models.CharField(max_length=255, null=True)
@@ -52,18 +54,27 @@ class UserProfile(models.Model):
     shirt_list = models.ManyToManyField("Alt.Shirt", verbose_name=("shirts"), blank=True, related_name='UserProfiles')
     atrocity_list = models.ManyToManyField('Alt.Atrocity', blank=True, related_name='UserProfiles')
     nonProfit_list = models.ManyToManyField('Alt.NonProfit',  blank=True, related_name='UserProfiles')
-    slug = models.SlugField()
-    altrue_name = models.CharField(max_length=20)
+    slug = models.SlugField(blank = True)
     qr_code_img = models.ImageField(upload_to= 'qr_codes', blank=True, null=True)
 
+
+    def get_absolute_url(self):
+        return reverse("api:user", kwargs={"slug": self.slug})
+    
 
     def __str__(self):
         return self.user.email
 
+
     def get_userName(self):
-        return self.user.username
+        return str(self.username)
+
+    def get_webUrl(self):
+        user_site = f' www.altrueglobal/user/{self.get_userName()}' 
+        return str(user_site)
 
     def save(self, *args, **kwargs):
+        self.slug = self.username
         self.generate_qr()
         super(UserProfile, self).save()
         
@@ -74,7 +85,7 @@ class UserProfile(models.Model):
             box_size=6,
             border=0,
         )
-        qr.add_data(self.get_userName())
+        qr.add_data(f'www.altrueglobal.org/true/{self.get_userName()}')
         qr.make(fit =True)
         filename = 'qr-%s.png' % (self.get_userName())
         img= qr.make_image()
@@ -85,11 +96,35 @@ class UserProfile(models.Model):
 
     
 
+class Balance(models.Model):
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    balance = models.IntegerField(default = 0)
 
+
+    class Meta:
+        verbose_name = _("Balance")
+        verbose_name_plural = _("Balances")
+
+    def __str__(self):
+        return self.user.email
+
+    def get_absolute_url(self):
+        return reverse("Balance_detail", kwargs={"pk": self.pk})
+
+        
+
+        
+
+class Donater(models.Model):
+    email = models.EmailField(max_length=254)
+    first_name = models.CharField( max_length=50)
+    last_name = models.CharField(max_length = 50)
+    amount = models.FloatField(default=0)
+    sent_to = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.email
     
-        
-        
-
 
 
 

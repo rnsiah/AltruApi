@@ -35,6 +35,10 @@ class Atrocity(models.Model):
     def slug(self):
         return slugify(self.title)        
 
+    def get_absolute_url(self):
+        return reverse ('Alt:Atrocity', kwargs={'slug':self.slug})
+
+
 
 
 class Shirt(models.Model):
@@ -137,6 +141,9 @@ class NonProfit(models.Model):
     main_image= models.CharField(max_length=100)
     
 
+    def get_absolute_url(self):
+        return reverse("Alt:NonProfit", kwargs={"slug": self.slug})
+    
 
 
 

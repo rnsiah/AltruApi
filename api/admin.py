@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User, UserProfile
+from .models import User, UserProfile, Donater, Balance
 
 
 class UserProfileInline(admin.StackedInline):
@@ -23,7 +23,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'username'),
+            'fields': ('email', 'password1', 'password2'),
         }),
     )
     list_display = ('email', 'first_name', 'last_name', 'is_staff')
@@ -32,3 +32,17 @@ class UserAdmin(BaseUserAdmin):
     inlines = (UserProfileInline, )
 
 
+class DonaterAdmin(admin.ModelAdmin):
+    model = Donater
+    fields = ('email', 'last_name', 'amount', 'sent_to', 'first_name')
+    list_display = ('email', 'last_name', 'amount', 'sent_to', 'first_name')
+
+
+class BalanceAdmin(admin.ModelAdmin):
+    model = Balance
+    fields = ('user', 'balance')
+    list_display =('user', 'balance')
+
+
+admin.site.register(Donater, DonaterAdmin)
+admin.site.register(Balance, BalanceAdmin)

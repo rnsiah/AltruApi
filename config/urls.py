@@ -28,7 +28,7 @@ urlpatterns = [
     path('secure/', obtain_auth_token),
     url(r'^auth/registration/', include('rest_auth.registration.urls')),
     path('', include('Alt.urls')),
-    path('payments/', include('StripeAPI.urls')),
+    url(r'^payments/', include('StripeAPI.urls', namespace='StripeAPI')),
     path('accounts/', include('allauth.urls')),
  
 

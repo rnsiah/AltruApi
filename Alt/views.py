@@ -15,14 +15,33 @@ def home(request):
   return render (request, 'landing.html')
 
 
-class UserProfileView(DetailView):
+
+
+
+
+class UserDetailView(DetailView):
   model = UserProfile
-  slug_field = 'altrue_name'
-  template_name = 'userprofile.html' 
+  
+   
+
+  def get_object(self, queryset=None):
+    
+    return self.model.objects.filter(slug='slug')
+    
+  def get_context_data(self, **kwargs):
+        context = super(UserDetailView, self).get_context_data(**kwargs)
+        context['shirt_list'] = Shirt.objects.all()
+        context['atrocity_list']= Atrocity.objects.all()
+        context['nonProfit_list'] = NonProfit.objects.all()
+        context['slug'] = 'slug'
+
+        return context
 
 
 
-
+def dontation_page(request, slug):
+  user = get_object_or_404(UserProfile, slug =slug)
+  return render (request, 'user.html', {'user':user})
 
 
 class ShirtList(ListView):

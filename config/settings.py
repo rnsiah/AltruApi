@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_countries',
     'allauth',
     'allauth.account',
+    
     'api',
     'rest_framework',
     'rest_framework.authtoken',
@@ -164,6 +165,7 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_root")
 MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'api.User'
+AUTH_PROFILE_MODEL = 'api.UserProfile'
 
 CORS_ALLOWED_ORIGINS = [
     
