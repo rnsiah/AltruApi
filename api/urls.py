@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from rest_framework import routers
-from api.views import UserViewSet,RatingViewSet, ShirtList
+from api.views import UserViewSet,RatingViewSet, ShirtList, UserProfileView
 from django.urls import path
 from . import views
 
@@ -10,6 +10,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register('ratings', RatingViewSet)
 router.register('shirts', ShirtList )
+router.register('userprofile', UserProfileView)
 
 
 
@@ -23,6 +24,8 @@ urlpatterns = [
     path('featuredshirts', views.FeaturedShirts.as_view()),
     path('featuredatrocities', views.FeaturedAtrocities.as_view()),
     path('featurednonprofits', views.FeaturedNonProfits.as_view()),
+   
+
     
     
 ]

@@ -196,5 +196,6 @@ AUTHENTICATION_BACKENDS = (
 
 
 REST_AUTH_SERIALIZERS ={
-    'USER_DETAILS_SERIALIZER' : 'api.serializers'
+    'USER_DETAILS_SERIALIZER' : 'api.serializers',
+    'TOKEN_SERIALIZER': 'api.serializers.CustomTokenSerializer',
 }

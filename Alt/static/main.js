@@ -1,26 +1,32 @@
-console.log("Sanity Check");
+console.log("Sanity check!");
 
 // Get Stripe publishable key
-
-fetch("/payments/config/")
+fetch("payments/config/")
     .then((result) => {
         return result.json();
     })
     .then((data) => {
-        //Initializing Stripe
+        // Initialize Stripe.js
         const stripe = Stripe(data.publicKey);
 
-        document.querySelector("#submitBtn").addEventListener("click", () => {
-            fetch("/payments/create-checkout-session")
-                .then((result) => {
-                    return result.json();
-                })
-                .then((data) => {
-                    console.log(data);
-                    return stripe.redirectToCheckout({ sessionId: data.sessionId });
-                })
-                .then((res) => {
-                    console.log(res);
-                });
-        });
+        // new
+        // Event handler
+        let submitBtn = document.querySelector("#submitBtn");
+        if (submitBtn !== null) {
+            submitBtn.addEventListener("click", () => {
+                // Get Checkout Session ID
+                fetch("/create-checkout-session/")
+                    .then((result) => {
+                        return result.json();
+                    })
+                    .then((data) => {
+                        console.log(data);
+                        // Redirect to Stripe Checkout
+                        return stripe.redirectToCheckout({ sessionId: data.sessionId });
+                    })
+                    .then((res) => {
+                        console.log(res);
+                    });
+            });
+        }
     });

@@ -14,10 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import include, url
+from django.conf import settings
+
 from django.urls import path
 import Alt, StripeAPI
 from rest_framework.authtoken.views import obtain_auth_token
-
+from django.conf.urls.static import static
 from django.contrib import admin
 
 
@@ -33,3 +35,5 @@ urlpatterns = [
  
 
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

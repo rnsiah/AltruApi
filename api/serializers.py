@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from api.models import User, UserProfile, Balance
 from  Alt.models import Shirt, Atrocity, NonProfit, Category, Rating
+from django.contrib.auth import get_user_model
+from rest_auth.serializers import TokenSerializer
 
 
 
@@ -64,27 +66,32 @@ class RatingSerializer(serializers.ModelSerializer):
         fields= ['user', 'shirt', 'stars']
 
 
+
 class UserProfileSerializer(serializers.ModelSerializer):
 
     shirt_list= ShirtSerializer(many=True, read_only=True)
     atrocity_list= AtrocitySerializer(many= True, read_only= True)
     nonProfit_list = NonProfitSerializer(many=True, read_only=True)
+    
+    
 
       
     class Meta:
         model = UserProfile
-        fields = ('title', 'dob', 'address', 'country', 'city', 'zip', 'qr_code', 'shirt_list', 'atrocity_list', 'nonProfit_list' )
+        fields = ('user','title', 'dob', 'address', 'country', 'city', 'zip', 'qr_code_img', 'shirt_list', 'atrocity_list', 'nonProfit_list' )
         depth = 3
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    userprofile = UserProfileSerializer(required=True)
-    
 
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    
+    
+    
     class Meta:
         model = User
-        fields = ('url', 'email', 'first_name', 'last_name', 'password','username',  'userprofile')
+        fields = ('url', 'email', 'first_name', 'last_name', 'password','username','id'  )
         extra_kwargs = {'password': {'write_only': True}}
+        depth = 2
 
     def create(self, validated_data):
         userprofile_data = validated_data.pop('userprofile')
@@ -114,3 +121,19 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         return instance
 
 
+
+
+
+
+
+class UserTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'email',)
+
+
+class CustomTokenSerializer(TokenSerializer):
+    user = UserTokenSerializer(read_only = True)
+
+    class Meta(TokenSerializer.Meta):
+        fields = ('key', 'user',)

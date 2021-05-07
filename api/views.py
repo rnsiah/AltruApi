@@ -1,13 +1,14 @@
 from rest_framework import viewsets, generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import TokenAuthentication
-from Alt.models import Shirt, NonProfit, Atrocity, Category, Rating
+from Alt.models import Shirt, NonProfit, Atrocity, Category, Rating, User
 from api.models import User, UserProfile
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .serializers import ShirtSerializer, NonProfitSerializer, AtrocitySerializer,  CategorySerializer, RatingSerializer
+from .serializers import ShirtSerializer, NonProfitSerializer, AtrocitySerializer,  CategorySerializer, RatingSerializer, UserProfileSerializer
 from api.serializers import UserSerializer
 from api.permissions import IsLoggedInUserOrAdmin, IsAdminUser
+from django.shortcuts import get_object_or_404
 
 
 
@@ -26,6 +27,8 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
     
+
+
 
 
 
@@ -83,6 +86,10 @@ class RatingViewSet(viewsets.ModelViewSet):
   serializer_class = RatingSerializer
   authentication_classes = (TokenAuthentication, )
   
+class UserProfileView(viewsets.ModelViewSet):
+  queryset=UserProfile.objects.all()
+  serializer_class = UserProfileSerializer
+  authentication_classes = (TokenAuthentication, )
 
 
 

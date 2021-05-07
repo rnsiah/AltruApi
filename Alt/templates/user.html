@@ -1,4 +1,9 @@
-{% extends 'base.html' %} {% load static %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block script %}
+<script src="https://js.stripe.com/v3/"></script>
+<!-- new -->
+
+<script src="{% static 'main.js' %}"></script>
+{% endblock script %} {% block content %}
 <div class="TY Message">
   <h1>Thank You</h1>
   <p>
@@ -6,11 +11,10 @@
     causes and world issues they care about the most, and possibly make a
     donation to a non profit of {{ user.slug }}'s choice.
   </p>
+  <img src="{{ user.qr_code_img }}" alt="{{ user.slug }}'s qr code" />
 </div>
+<button class="button is-primary" id="submitBtn">Purchase!</button>
 
-<button id="submitBtn">
-  <a href="{% url 'StripeAPI:create-checkout-session' %}"> Donate Now </a>
-</button>
 {% for shirt in user.shirt_list.all %}
 <div class="ShirtList">
   <h1>{{ shirt.name }}</h1>
