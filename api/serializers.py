@@ -3,6 +3,7 @@ from api.models import User, UserProfile, Balance
 from  Alt.models import Shirt, Atrocity, NonProfit, Category, Rating
 from django.contrib.auth import get_user_model
 from rest_auth.serializers import TokenSerializer
+from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 
 
 
@@ -14,7 +15,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields=['name', 'image','information',]
+        fields=['id','name', 'image','information',]
         depth = 2
 
 
@@ -26,7 +27,7 @@ class AtrocitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Atrocity
-        fields = ['title', 'region', 'info', 'image_url', 'category','country','slug', 'videoURL' ]
+        fields = ['id','title', 'region', 'info', 'image_url', 'category','country','slug', 'videoURL' ]
         depth = 3
 
 
@@ -55,7 +56,7 @@ class NonProfitSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NonProfit
-        fields = ['name','logo', 'description', 'year_started', 'mission_statement','vision_statement','website_url','category','slug', 'atrocity', 'shirtList', 'main_image']
+        fields = ['id','name','logo', 'description', 'year_started', 'mission_statement','vision_statement','website_url','category','slug', 'atrocity', 'shirtList', 'main_image']
         depth = 2
 
 
@@ -67,30 +68,16 @@ class RatingSerializer(serializers.ModelSerializer):
 
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-
-    shirt_list= ShirtSerializer(many=True, read_only=True)
-    atrocity_list= AtrocitySerializer(many= True, read_only= True)
-    nonProfit_list = NonProfitSerializer(many=True, read_only=True)
-    
-    
-
-      
-    class Meta:
-        model = UserProfile
-        fields = ('user','title', 'dob', 'address', 'country', 'city', 'zip', 'qr_code_img', 'shirt_list', 'atrocity_list', 'nonProfit_list' )
-        depth = 3
-
-
-
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    
-    
+
+    profile= serializers.HyperlinkedRelatedField(many= False, read_only= False, queryset= UserProfile.objects.all() ,view_name = 'userprofile-detail' )
+
     
     class Meta:
         model = User
-        fields = ('url', 'email', 'first_name', 'last_name', 'password','username','id'  )
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ('url', 'email', 'first_name', 'last_name', 'password','username','id' ,'profile', 'profile_created' )
+        extra_kwargs = {'password': {'write_only': True},
+                        'profile':{}}
         depth = 2
 
     def create(self, validated_data):
@@ -125,11 +112,36 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    
+    shirt_list= PresentablePrimaryKeyRelatedField(many=True, presentation_serializer = ShirtSerializer, read_only=False, queryset =Shirt.objects.all())
+    atrocity_list= PresentablePrimaryKeyRelatedField(many= True, presentation_serializer = AtrocitySerializer,read_only= False, queryset= Atrocity.objects.all())
+    nonProfit_list = PresentablePrimaryKeyRelatedField(many=True,presentation_serializer=NonProfitSerializer ,read_only=False, queryset = NonProfit.objects.all())
+    user = UserSerializer()
+    
+
+      
+    class Meta:
+        model = UserProfile
+        fields = ('user','username','title', 'dob', 'address', 'country', 'city', 'zip', 'qr_code_img', 'shirt_list', 'atrocity_list', 'nonProfit_list' )
+        depth = 2
+
+    def create(self, validated_data):
+        return UserProfile(**validated_data)
+
+
+
+
+
+
+
+
+
 
 class UserTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email',)
+        fields = ('id', 'email','profile_created')
 
 
 class CustomTokenSerializer(TokenSerializer):

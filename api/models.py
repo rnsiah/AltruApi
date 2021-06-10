@@ -24,9 +24,10 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 class User(AbstractUser):
     username = models.CharField(max_length=100, blank = True, null=True)
     email = models.EmailField(_('email address'), unique=True)
+    profile_created = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return "{}".format(self.email)
@@ -43,20 +44,20 @@ def upload_path_handler():
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile', primary_key=True)
-    username = models.CharField(max_length=100)
-    title = models.CharField(max_length=5)
-    dob = models.DateField(null=True)
-    address = models.CharField(max_length=255, null=True)
-    country = models.CharField(max_length=50, null= True)
-    city = models.CharField(max_length=50, null=True)
-    zip = models.CharField(max_length=5, null=True)
+    username = models.CharField(max_length=100,unique= True, null=True, blank = True)
+    title = models.CharField(max_length=5, null= True, blank=True)
+    dob = models.CharField(null=True, blank=True, max_length= 12)
+    address = models.CharField(max_length=255, null=True, blank= True)
+    country = models.CharField(max_length=50, null= True, blank=True)
+    city = models.CharField(max_length=50, null=True, blank=True)
+    zip = models.CharField(max_length=5, null=True, blank =True)
     qr_code= models.CharField(max_length=50, blank=True, null=True)
-    shirt_list = models.ManyToManyField("Alt.Shirt", verbose_name=("shirts"), blank=True, related_name='UserProfiles')
+    shirt_list = models.ManyToManyField("Alt.Shirt",  verbose_name=("shirts"), blank=True, related_name='UserProfiles')
     atrocity_list = models.ManyToManyField('Alt.Atrocity', blank=True, related_name='UserProfiles')
     nonProfit_list = models.ManyToManyField('Alt.NonProfit',  blank=True, related_name='UserProfiles')
-    slug = models.SlugField(blank = True)
+    slug = models.SlugField(blank = True, null = True)
     qr_code_img = models.ImageField(upload_to= 'qr_codes', blank=True, null=True)
-
+    
 
     def get_absolute_url(self):
         return reverse("api:user", kwargs={"slug": self.slug})
@@ -77,6 +78,7 @@ class UserProfile(models.Model):
         self.slug = self.username
         self.generate_qr()
         super(UserProfile, self).save()
+
         
     def generate_qr(self):
         qr = qrcode.QRCode(
@@ -135,6 +137,22 @@ class Donater(models.Model):
      
   
 
+
+@receiver(post_save, sender = UserProfile)
+def profile_updated(sender, instance, created,  **kwargs):
+        if not created:
+            user = User.objects.get(id = instance.pk)
+            
+            
+            if user.profile_created == False:
+                user.profile_created = True
+                user.save()
+                
+                
+               
+        else: None
+    
+    
 
 
 @receiver(post_save, sender=User)

@@ -32,6 +32,7 @@ urlpatterns = [
     path('', include('Alt.urls')),
     url(r'^payments/', include('StripeAPI.urls', namespace='StripeAPI')),
     path('accounts/', include('allauth.urls')),
+    path('verification/', include('verify_email.urls')),
  
 
 ]

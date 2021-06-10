@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django_countries',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount' ,
+    "verify_email.apps.VerifyEmailConfig",
     
     'api',
     'rest_framework',
@@ -52,6 +54,7 @@ INSTALLED_APPS = [
     'StripeAPI',
     'stripe',
     'qr_code',
+    
   
 ]
 
@@ -177,12 +180,26 @@ STRIPE_SECRET_KEY ='sk_test_51HF8cGLtfSZy4bJMhU10RNlsqEYNLbxtBR3PSPMifN3G1eIGj5h
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51HF8cGLtfSZy4bJME1EEVB3NK2ymtrhBc90Rnl1M3vqaszeVi91JLHYhvjNOxJMlPffbmupoefjGABVNjFSIHPtK00u4F0AOwd'
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True   
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'r.nsiah@gmail.com'
+EMAIL_HOST_PASSWORD = 'Zanovia112'
+
+DEFAULT_FROM_EMAIL = 'noreply<no_reply@altrueglobal.com>'
+
+
+
+
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 

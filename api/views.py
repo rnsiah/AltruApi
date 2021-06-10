@@ -1,5 +1,6 @@
 from rest_framework import viewsets, generics, status
-from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from Alt.models import Shirt, NonProfit, Atrocity, Category, Rating, User
 from api.models import User, UserProfile
@@ -9,6 +10,15 @@ from .serializers import ShirtSerializer, NonProfitSerializer, AtrocitySerialize
 from api.serializers import UserSerializer
 from api.permissions import IsLoggedInUserOrAdmin, IsAdminUser
 from django.shortcuts import get_object_or_404
+from django.http.response import Http404
+from django.http import HttpResponse
+
+
+
+
+class UserProfileFinder(generics.RetrieveUpdateDestroyAPIView):
+  serializer_class= UserProfileSerializer
+  queryset= UserProfile.objects.all()
 
 
 
@@ -28,13 +38,52 @@ class UserViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
 
+class UserDetail(APIView):
+  permission_classes = (IsAuthenticated, )
+  
+
+
+
+class UserProfileDetail(APIView):
+   permission_classes = (IsAuthenticated, )
+
+   def get_object(self, pk):
+    try:
+      return UserProfile.objects.get(pk = pk)
+    except UserProfile.DoesNotExist:
+      raise Http404
+
+    def get(self, request, pk, format=None):
+      userprofile = self.get_object(pk)
+      serializer = UserProfileSerializer(userprofile)
+      return Response(serializer.data)
+
+   def patch(self, request, pk, format=None):
+      userprofile = self.get_object(pk)
+      serializer = UserProfileSerializer(userprofile, data=request.data, partial=True)
+      if serializer.is_valid():
+        
+        serializer.save()
+        return HttpResponse(status=200)
+      return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+   def delete(self, request, pk, format=None):
+       userprofile = self.get_object(pk)
+       userprofile.delete()
+       return Response(status = status.HTTP_204_NO_CONTENT)
+
+  
+
+  
+
 
 
 
 
 
 class ShirtList(viewsets.ModelViewSet):
-  authentication_classes = (TokenAuthentication, )
+  authentication_classes = ()
 
   serializer_class = ShirtSerializer
   queryset= Shirt.objects.all()

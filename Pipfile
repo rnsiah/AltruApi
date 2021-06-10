@@ -19,7 +19,8 @@ segno = "*"
 pillow = "*"
 qrcode = "*"
 django-qr-code = "*"
-
+django-verify-email = "*"
+drf-extra-fields = "*"
 
 [requires]
 python_version = "3.8"

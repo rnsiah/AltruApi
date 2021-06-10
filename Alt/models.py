@@ -10,7 +10,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Country(models.Model):
     name= models.CharField( max_length=50, blank=False, null=False)
-    flag =models.CharField(max_length=50, blank=True, null=True)
+    flag =models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -138,7 +138,7 @@ class NonProfit(models.Model):
     date_added= models.DateTimeField(auto_now_add=True)
     atrocity = models.ManyToManyField(Atrocity, blank=True, null=True, related_name='NonProfit')
     shirtList=models.ManyToManyField("Shirt",related_name='NonProfit' )
-    main_image= models.CharField(max_length=100)
+    main_image= models.CharField(max_length=200)
     
 
     def get_absolute_url(self):
